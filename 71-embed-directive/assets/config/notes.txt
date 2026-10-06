@@ -1,0 +1,1 @@
+This file must NOT end up in the embedded file system: only *.env files should.

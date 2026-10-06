@@ -1,0 +1,10 @@
+# Binaries and test artifacts
+*.exe
+*.test
+*.out
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
