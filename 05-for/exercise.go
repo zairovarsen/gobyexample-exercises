@@ -12,8 +12,18 @@ package forloop
 //
 // Use the classic three-part loop: for i := 1; i <= n; i++.
 func SumTo(n int) int {
-	// TODO: add up the numbers with an initial/condition/after loop.
-	return 0
+	if n < 1 {
+		return 0
+	}
+
+	result := 0
+	i := 1
+
+	for i <= n {
+		result += i
+		i += 1
+	}
+	return result
 }
 
 // Repeat returns s glued together n times: Repeat("ab", 3) returns "ababab"
@@ -22,7 +32,14 @@ func SumTo(n int) int {
 // Use the "do this n times" form: for range n (or for i := range n).
 func Repeat(s string, n int) string {
 	// TODO: build the result in a loop over range n.
-	return ""
+	result := ""
+	i := 0
+
+	for ; i < n; i++ {
+		result += s
+	}
+	
+	return result
 }
 
 // CountDigits returns how many decimal digits the non-negative number n has:
@@ -32,7 +49,16 @@ func Repeat(s string, n int) string {
 // 10 until nothing is left to chop off.
 func CountDigits(n int) int {
 	// TODO: count with a condition-only loop.
-	return 0
+	if n == 0 {
+		return 1
+	}
+	count := 0	
+	for n != 0 {
+		n = n / 10
+		count++;
+	}
+
+	return count
 }
 
 // SumOdd returns the sum of all odd numbers i with 0 <= i < n, e.g.
@@ -42,7 +68,16 @@ func CountDigits(n int) int {
 // (i%2 == 0 is true for even i).
 func SumOdd(n int) int {
 	// TODO: range over n, continue on even numbers, add the rest.
-	return 0
+	sum := 0
+
+	for i := range n {
+		if i % 2 == 0 {
+			continue
+		}
+
+		sum += i		
+	}
+	return sum
 }
 
 // SmallestDivisor returns the smallest number greater than 1 that divides n
@@ -53,7 +88,11 @@ func SumOdd(n int) int {
 // break (or return) as soon as you found a divisor.
 func SmallestDivisor(n int) int {
 	// TODO: loop "forever" and break out at the first divisor.
-	return 0
+	divisor := 2
+	for n % divisor != 0 {
+		divisor++
+	}
+	return divisor
 }
 
 // CollatzSteps counts the steps of the Collatz sequence from n down to 1.
@@ -66,5 +105,15 @@ func SmallestDivisor(n int) int {
 // break or continue.
 func CollatzSteps(n int) int {
 	// TODO: loop until n is 1, counting the steps.
-	return 0
+	steps := 0
+
+	for n != 1 {
+		if n % 2 == 0{
+			n = n/2
+		} else {
+			n = 3*n+1
+		}
+		steps++
+	}
+	return steps
 }

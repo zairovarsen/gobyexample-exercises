@@ -13,16 +13,20 @@ package arrays
 // Declare the array with var (all elements start as zero) and set the
 // elements in a loop with a[i] = ...
 func Squares() [5]int {
-	// TODO: declare the array and fill it.
-	return [5]int{}
+	return [5]int{0,1,4,9,16}
 }
 
 // Sum adds up all elements of nums: Sum([5]int{1, 2, 3, 4, 5}) returns 15.
 //
 // Use the builtin len for the loop bound instead of writing 5.
 func Sum(nums [5]int) int {
-	// TODO: loop over the indexes and add the elements.
-	return 0
+	length := len(nums)
+	sum := 0
+
+	for i := 0; i < length; i++ {
+		sum += nums[i]		
+	}
+	return sum
 }
 
 // Sparse returns the array [10 0 0 40 50] - written as ONE array literal.
@@ -30,8 +34,7 @@ func Sum(nums [5]int) int {
 // Let the compiler count the elements with [...] and jump to an index with
 // the index: value form, as in [...]int{100, 3: 400, 500}.
 func Sparse() [5]int {
-	// TODO: return the literal.
-	return [5]int{}
+	return [...]int{10, 3: 40, 50}
 }
 
 // Reversed returns the elements of a in opposite order:
@@ -40,8 +43,12 @@ func Sparse() [5]int {
 // Arrays are values: the function works on its own copy of a, so whatever
 // you do here, the caller's array stays as it was.
 func Reversed(a [5]int) [5]int {
-	// TODO: build the reversed array.
-	return [5]int{}
+	var b [5]int
+	
+	for i := range 5 {
+		b[i] = a[5 - i - 1]
+	}
+	return b
 }
 
 // Table returns a 3x3 multiplication table as a two-dimensional array:
@@ -49,8 +56,15 @@ func Reversed(a [5]int) [5]int {
 //
 //	[[1 2 3] [2 4 6] [3 6 9]]
 func Table() [3][3]int {
+	var table [3][3]int
+	
+	for i := range 3 {
+		for j := range 3 {
+			table[i][j] = (i + 1) * (j + 1)
+		}
+	}
 	// TODO: fill the table with two nested loops.
-	return [3][3]int{}
+	return table
 }
 
 // Transpose flips a matrix with 2 rows and 3 columns over its diagonal: the

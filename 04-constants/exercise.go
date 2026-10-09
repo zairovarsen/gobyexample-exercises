@@ -7,17 +7,19 @@
 //	go test ./04-constants/
 package constants
 
+import "math"
+
 // Language is a string constant with the value "Go".
 //
 // TODO: give it the right value.
-const Language = ""
+const Language string = "Go"
 
 // Timeout is a TYPED constant: its type is int64 and its value is 30.
 // (A constant declared without a type, like the one below, is "untyped" and
 // only gets a type when it is used.)
 //
 // TODO: add the type and the value.
-const Timeout = 0
+const Timeout int64 = 30
 
 // These three are given.
 const (
@@ -31,8 +33,8 @@ const (
 //
 // TODO: replace both zeros with an expression - do not type 3600 or 86400.
 const (
-	SecondsPerHour = 0
-	SecondsPerDay  = 0
+	SecondsPerHour = SecondsPerMinute * MinutesPerHour
+	SecondsPerDay  = SecondsPerHour * HoursPerDay
 )
 
 // Zebi and Yobi are given. Both are far too big for any integer type (int64
@@ -47,7 +49,7 @@ const (
 //
 // TODO: replace the zero with a constant expression that divides the two
 // huge constants. The result is small enough to be used as a normal int.
-const ZebisPerYobi = 0
+const ZebisPerYobi = Yobi/Zebi
 
 // CircleArea returns the area of a circle with the given radius: pi times
 // the radius squared.
@@ -55,7 +57,7 @@ const ZebisPerYobi = 0
 // Hint: the "math" package has the untyped constant math.Pi.
 func CircleArea(radius float64) float64 {
 	// TODO: compute the area with math.Pi.
-	return 0
+	return math.Pi * (radius * radius)
 }
 
 // Kilo is given. It is untyped, so it takes on whatever numeric type the
@@ -66,14 +68,14 @@ const Kilo = 1000
 // Use Kilo.
 func Kilograms(grams float64) float64 {
 	// TODO: divide by Kilo.
-	return 0
+	return grams / Kilo
 }
 
 // Grams converts whole kilograms to grams: Grams(3) returns 3000.
 // Use the very same Kilo - this time it acts as an int.
 func Grams(kilograms int) int {
 	// TODO: multiply by Kilo.
-	return 0
+	return kilograms * Kilo
 }
 
 // TotalTimeout returns the time spent waiting when an operation is tried the
@@ -86,5 +88,5 @@ func Grams(kilograms int) int {
 // with int64(d).
 func TotalTimeout(retries int) int {
 	// TODO: multiply retries by Timeout, converting Timeout to int.
-	return 0
+	return retries * int(Timeout)
 }

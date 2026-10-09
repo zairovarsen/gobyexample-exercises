@@ -10,14 +10,20 @@
 //	go test ./09-slices/
 package slicesx
 
+import "slices"
+
 // Countdown returns the numbers from n down to 1: Countdown(3) returns
 // [3 2 1]. For n < 1 the result is empty.
 //
 // Start with a nil slice (var s []int) and grow it with append. Remember
 // that append returns the new slice.
 func Countdown(n int) []int {
-	// TODO: append the numbers one by one.
-	return nil
+	var s []int
+	for i := range n {
+		s = append(s, n - i)
+	}
+
+	return s
 }
 
 // Middle returns s without its first and its last element, using the slice
@@ -27,8 +33,11 @@ func Countdown(n int) []int {
 // The result must be a view of s, not a copy - slicing a slice does not copy
 // the elements.
 func Middle(s []int) []int {
-	// TODO: slice s.
-	return nil
+	length := len(s)
+	if length < 3 {
+		return []int{}
+	}
+	return s[1:length - 1]
 }
 
 // Clone returns a new slice with the same elements as s that does NOT share
@@ -37,8 +46,9 @@ func Middle(s []int) []int {
 // Create a slice of the right length with make and fill it with the builtin
 // copy.
 func Clone(s []int) []int {
-	// TODO: make + copy.
-	return nil
+	s2 := make([]int, len(s))
+	copy(s2, s)
+	return s2
 }
 
 // HasPrefix reports whether s starts with the elements of prefix, in the same
@@ -52,7 +62,12 @@ func Clone(s []int) []int {
 // slices.Equal from the "slices" package.
 func HasPrefix(s, prefix []string) bool {
 	// TODO: compare the first len(prefix) elements of s with prefix.
-	return false
+	if len(prefix) > len(s) {
+		return false
+	}
+
+	start := s[0:len(prefix)]
+	return slices.Equal(start, prefix)
 }
 
 // Triangle returns a two-dimensional slice with n rows whose rows have
@@ -63,7 +78,16 @@ func HasPrefix(s, prefix []string) bool {
 // Create the outer slice with make, then make every inner slice separately.
 func Triangle(n int) [][]int {
 	// TODO: make the rows and fill them.
-	return nil
+	var triangle [][]int = make([][]int, n)
+
+	for i := range n {
+		innerLen := i + 1
+		triangle[i] = make([]int, innerLen)
+		for j := range innerLen {
+			triangle[i][j] = i + j
+		}	
+	}
+	return triangle
 }
 
 // Remove returns a NEW slice that holds the elements of s except the one at
@@ -75,6 +99,8 @@ func Triangle(n int) [][]int {
 // to s[:i]: the result would share its memory with s and overwrite it.
 // Make a fresh slice and copy the two parts into it.
 func Remove(s []int, i int) []int {
-	// TODO: copy s[:i] and s[i+1:] into a new slice.
-	return nil
+	s2 := make([]int, len(s) - 1)
+	copy(s2, s[:i])
+	copy(s2[i:], s[i+1:])
+	return s2
 }

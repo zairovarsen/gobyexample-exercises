@@ -10,7 +10,10 @@ package ifelse
 // EvenOrOdd returns "even" when n is divisible by 2 and "odd" otherwise.
 func EvenOrOdd(n int) string {
 	// TODO: decide with if / else.
-	return ""
+	if n % 2 == 0 {
+		return "even"
+	}
+	return "odd"
 }
 
 // Compare returns "less" when a < b, "equal" when a == b and "greater" when
@@ -21,7 +24,14 @@ func EvenOrOdd(n int) string {
 // diff in the else if branch.
 func Compare(a, b int) string {
 	// TODO: use an if / else if / else chain with a short statement.
-	return ""
+
+	if diff := a -b; diff < 0 {
+		return "less"
+	} else if diff > 0  {
+		return "greater"
+	} else {
+		return "equal"
+	}
 }
 
 // LeapYear reports whether year is a leap year: a year divisible by 4 is a
@@ -31,16 +41,24 @@ func Compare(a, b int) string {
 //
 // Combine the conditions with && and ||.
 func LeapYear(year int) bool {
-	// TODO: test the divisibility rules.
-	return false
+	return year%4 == 0 && year%100 != 0 || year%400 == 0
 }
 
 // Grade turns a score from 0 to 100 into a letter: 90 and above is "A", 80 to
 // 89 is "B", 70 to 79 is "C", 60 to 69 is "D" and everything below is "F".
 // A score below 0 or above 100 is "invalid".
 func Grade(score int) string {
-	// TODO: check for an invalid score first, then walk down the grades.
-	return ""
+	if score >= 90 {
+		return "A"
+	} else if score >= 80 && score < 90 {
+		return "B"
+	} else if score >= 70 && score < 80 {
+		return "C"
+	} else if score >= 60 && score < 70 {
+		return "D"
+	} else {
+		return "F"
+	}
 }
 
 // FizzBuzz returns "Fizz" when n is divisible by 3, "Buzz" when n is

@@ -15,7 +15,16 @@ import "time"
 // Use a basic switch on n with a default case.
 func NumberWord(n int) string {
 	// TODO: switch on n.
-	return ""
+	switch {
+		case n == 1:
+			return "one"	
+		case n == 2:
+			return "two"
+		case n == 3:
+			return "three"
+		default:
+			return "many"
+	}
 }
 
 // DayKind returns "weekend" for Saturday and Sunday and "weekday" for the
@@ -25,7 +34,12 @@ func NumberWord(n int) string {
 // called time.Saturday, time.Sunday and so on.
 func DayKind(day time.Weekday) string {
 	// TODO: one case for the weekend, default for the rest.
-	return ""
+	switch day {
+	case time.Sunday, time.Saturday:
+		return "weekend"
+	default:
+		return "weekday"
+	}
 }
 
 // TimeOfDay names the part of the day an hour (0-23) belongs to: "morning"
@@ -35,8 +49,16 @@ func DayKind(day time.Weekday) string {
 // Use a switch without an expression - it works like an if/else chain, and
 // every case holds a condition such as hour < 12.
 func TimeOfDay(hour int) string {
-	// TODO: switch with conditions in the cases.
-	return ""
+	switch {
+	case hour < 0, hour > 23:
+		return "invalid"
+	case hour < 12:
+		return "morning"
+	case hour >= 18:
+		return "evening"
+	default:
+		return "afternoon"
+	}
 }
 
 // TypeName returns the name of the type of the value stored in v: "bool",
@@ -47,7 +69,18 @@ func TimeOfDay(hour int) string {
 // of every type. Use a type switch: switch v.(type) { case bool: ... }.
 func TypeName(v any) string {
 	// TODO: type switch.
-	return ""
+	switch v.(type) {
+	case bool:
+		return "bool"
+	case int:
+		return "int"
+	case float64:
+		return "float64"
+	case string: 
+		return "string"
+	default: 
+		return "unknown"
+	}
 }
 
 // Measure gives a value a size, depending on its type:
@@ -62,7 +95,19 @@ func TypeName(v any) string {
 // string case, and so on.
 func Measure(v any) int {
 	// TODO: type switch that binds the value to a variable.
-	return 0
+	switch t := v.(type) {
+	case bool: 
+		if t {
+			return 1
+		}
+		return 0
+	case int:
+		return t
+	case string:
+		return len(t)
+	default: 
+		return -1
+	}
 }
 
 // DaysInMonth returns the number of days of a month (1 = January, ...,
