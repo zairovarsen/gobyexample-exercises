@@ -10,14 +10,24 @@
 //	go test ./10-maps/
 package mapsx
 
+import "maps"
+
 // Squares returns a map from every number 1, 2, ..., n to its square:
 // Squares(3) returns map[1:1 2:4 3:9]. For n < 1 the map is empty (but not
 // nil).
 //
 // Create the map with make and set the pairs with m[key] = value.
 func Squares(n int) map[int]int {
-	// TODO: make the map and fill it in a loop.
-	return nil
+	m := make(map[int]int)
+
+	if n < 1 {
+		return m
+	}
+
+	for i := 1; i <= n; i++ {
+		m[i] = i * i
+	}	
+	return m
 }
 
 // GetOr returns the value stored under key in m, or fallback when m has no
@@ -29,7 +39,13 @@ func Squares(n int) map[int]int {
 // lookup, value, present := m[key].
 func GetOr(m map[string]int, key string, fallback int) int {
 	// TODO: look the key up with the two-value form.
-	return 0
+	
+	v, prs := m[key]
+
+	if prs {
+		return v
+	}
+	return fallback
 }
 
 // WordCount returns how often each word occurs in words:
@@ -38,8 +54,15 @@ func GetOr(m map[string]int, key string, fallback int) int {
 // Reading a missing key gives the zero value, which makes counting very
 // short.
 func WordCount(words []string) map[string]int {
+	wc := make(map[string]int)
 	// TODO: count every word.
-	return nil
+	length := len(words)
+
+	for i := range length {
+		key := words[i]
+		wc[key] = wc[key] + 1
+	}
+	return wc
 }
 
 // Remove deletes the given keys from m and returns how many keys really were
@@ -52,14 +75,24 @@ func WordCount(words []string) map[string]int {
 // because a map value refers to the same underlying data when it is passed
 // around. Use the builtin delete.
 func Remove(m map[string]int, keys []string) int {
-	// TODO: check that each key is present, delete it and count.
-	return 0
+	c := 0
+	length := len(keys)
+
+	for i := range length {
+		key := keys[i]
+		_, prs := m[key]
+		if prs {
+			c++
+			delete(m, key)
+		}
+	}
+	return c
 }
 
 // Reset removes every key/value pair from m with the builtin clear, so that
 // the caller's map is empty afterwards.
 func Reset(m map[string]int) {
-	// TODO: clear the map.
+	clear(m)
 }
 
 // SameWords reports whether a and b contain the same words the same number
@@ -68,6 +101,8 @@ func Reset(m map[string]int) {
 //
 // Hint: you already have WordCount, and the "maps" package has maps.Equal.
 func SameWords(a, b []string) bool {
-	// TODO: compare the word counts of a and b.
-	return false
+	wc1 := WordCount(a)
+	wc2 := WordCount(b)
+
+	return maps.Equal(wc1, wc2)
 }
