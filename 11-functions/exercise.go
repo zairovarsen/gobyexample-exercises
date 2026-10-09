@@ -13,7 +13,7 @@ package functions
 // expression on its own.
 func Plus(a int, b int) int {
 	// TODO: return the sum.
-	return 0
+	return a + b
 }
 
 // PlusPlus returns the sum of a, b and c. Its parameters share one type
@@ -22,7 +22,7 @@ func Plus(a int, b int) int {
 // Do not use + more than once here: call Plus instead.
 func PlusPlus(a, b, c int) int {
 	// TODO: build the result from calls to Plus.
-	return 0
+	return Plus(Plus(a,b),c)
 }
 
 // Clamp forces n into the range from low to high: it returns low when n is
@@ -30,8 +30,13 @@ func PlusPlus(a, b, c int) int {
 //
 // Example: Clamp(15, 0, 10) returns 10 and Clamp(5, 0, 10) returns 5.
 func Clamp(n, low, high int) int {
-	// TODO: compare and return the right value.
-	return 0
+	if n < low {
+		return low
+	} else if n > high {
+		return high
+	} else {
+		return n
+	}
 }
 
 // Average returns the mean of nums: Average([1 2 4]) returns 2.3333...
@@ -39,16 +44,39 @@ func Clamp(n, low, high int) int {
 //
 // Hint: float64(len(nums)) converts the length to a float.
 func Average(nums []float64) float64 {
+	if len(nums) == 0 {
+		return 0
+	}
 	// TODO: sum the numbers and divide by how many there are.
-	return 0
+	sum := 0.0
+	for i := range len(nums) {
+		sum += nums[i]
+	}
+	return sum / float64(len(nums))
 }
 
 // IsPrime reports whether n is a prime number: a number greater than 1 that
 // is divisible only by 1 and by itself. 2, 3, 5, 7 and 11 are prime; 0, 1,
 // 4 and 9 are not, and neither is any negative number.
 func IsPrime(n int) bool {
+	if n < 2 {
+		return false
+	}
+	divisor := 2
+	
+	for {
+		if divisor == n {
+			break
+		}
+		
+		if n % divisor == 0 {
+			return false
+		}
+
+		divisor++
+	}
 	// TODO: look for a divisor between 2 and n-1.
-	return false
+	return true
 }
 
 // CountPrimes returns how many prime numbers there are from 1 up to and
@@ -57,5 +85,16 @@ func IsPrime(n int) bool {
 // This is what functions are for: let IsPrime do the hard part.
 func CountPrimes(limit int) int {
 	// TODO: call IsPrime in a loop and count.
-	return 0
+	count := 0
+	for i := range limit {
+		if (IsPrime(i)) {
+			count++	
+		}
+	}
+
+	if (IsPrime(limit)) {
+		count++
+	}
+
+	return count
 }
