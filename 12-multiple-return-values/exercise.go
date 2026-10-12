@@ -11,14 +11,14 @@ package multiplereturnvalues
 // "b", "a".
 func Swap(a, b string) (string, string) {
 	// TODO: return both values.
-	return "", ""
+	return b, a
 }
 
 // DivMod returns the quotient and the remainder of the integer division
 // a / b: DivMod(17, 5) returns 3, 2. b is never 0 in the tests.
 func DivMod(a, b int) (int, int) {
 	// TODO: return a / b and a % b.
-	return 0, 0
+	return a/b, a%b
 }
 
 // Clock splits a number of seconds into hours, minutes and seconds:
@@ -28,14 +28,30 @@ func DivMod(a, b int) (int, int) {
 // its two results with a, b := DivMod(...).
 func Clock(seconds int) (int, int, int) {
 	// TODO: split off the hours, then the minutes.
-	return 0, 0, 0
+	hours, seconds := DivMod(seconds, 60 * 60)
+	minutes, seconds := DivMod(seconds, 60)
+
+	return hours, minutes, seconds
 }
 
 // MinMax returns the smallest and the largest number in nums:
 // MinMax([3 9 -2 4]) returns -2, 9. For an empty slice it returns 0, 0.
 func MinMax(nums []int) (int, int) {
 	// TODO: find both in one pass over nums.
-	return 0, 0
+	if len(nums) == 0 {
+		return 0,0
+	}
+	min, max := nums[0], nums[0]
+	
+	for i:=1; i < len(nums); i++ {
+		if (nums[i] > max) {
+			max = nums[i]
+		} else if (nums[i] < min) {
+			min = nums[i]
+		}
+	}
+
+	return min, max
 }
 
 // Largest returns the largest number in nums, or 0 for an empty slice.
@@ -44,7 +60,8 @@ func MinMax(nums []int) (int, int) {
 // not need with the blank identifier _.
 func Largest(nums []int) int {
 	// TODO: call MinMax, ignore the minimum.
-	return 0
+	_, largest := MinMax(nums)
+	return largest
 }
 
 // Winner counts the votes of an election. Every element of votes is the name
@@ -59,5 +76,19 @@ func Largest(nums []int) int {
 // to find the first candidate with the highest count.
 func Winner(votes []string) (string, int) {
 	// TODO: count the votes and pick the winner.
-	return "", 0
+	votesCount := make(map[string]int)
+	for i := 0; i < len(votes); i++ {
+		votesCount[votes[i]]++
+	}
+	highestCount, highestCountName := 0, ""
+
+	for i := 0; i < len(votes); i++ {
+		count := votesCount[votes[i]]
+		if (count > highestCount) {
+			highestCount = count
+			highestCountName = votes[i]
+		}
+	}
+
+	return highestCountName, highestCount 
 }
