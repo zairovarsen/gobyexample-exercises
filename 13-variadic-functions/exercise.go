@@ -13,14 +13,24 @@ package variadicfunctions
 // loop over it with for _, num := range nums.
 func Sum(nums ...int) int {
 	// TODO: add up nums.
-	return 0
+	sum := 0
+	for _, num := range nums {
+		sum += num
+	}
+	return sum
 }
 
 // Average returns the mean of its arguments: Average(1, 2, 4) returns
 // 2.3333... Without arguments it returns 0.
 func Average(nums ...float64) float64 {
-	// TODO: divide the total by the number of arguments.
-	return 0
+	if len(nums) == 0 {
+		return 0
+	}
+	sum := 0.0
+	for _, num := range nums {
+		sum += num
+	}
+	return sum / float64(len(nums))
 }
 
 // Join glues parts together with sep between them:
@@ -30,8 +40,16 @@ func Average(nums ...float64) float64 {
 // Only the last parameter of a function can be variadic; ordinary parameters
 // such as sep come before it.
 func Join(sep string, parts ...string) string {
+	str := ""
 	// TODO: concatenate the parts, with sep in between.
-	return ""
+
+	for i, part := range parts {
+		if i != 0 {
+			str += sep
+		}
+		str += part
+	}
+	return str
 }
 
 // Max returns the largest of its arguments: Max(3, 9, 4) returns 9.
@@ -40,7 +58,13 @@ func Join(sep string, parts ...string) string {
 // ordinary parameter first forces callers to pass at least one number.
 func Max(first int, rest ...int) int {
 	// TODO: start with first and compare it with the rest.
-	return 0
+	max := first
+	for _, n := range rest {
+		if n > max {
+			max = n
+		}
+	}
+	return max
 }
 
 // Total returns the sum of all numbers in all the given slices:
@@ -50,7 +74,13 @@ func Max(first int, rest ...int) int {
 // can be spread over a variadic parameter with a trailing ...: Sum(list...)
 func Total(lists ...[]int) int {
 	// TODO: call Sum for every list, spreading the slice.
-	return 0
+	sum := 0
+	for _, list := range lists {
+		for i := range len(list) {
+			sum += list[i]
+		}
+	}
+	return sum
 }
 
 // Greet builds a greeting for any number of people:
@@ -67,5 +97,11 @@ func Total(lists ...[]int) int {
 // them when you spread the slice.
 func Greet(greeting string, names ...string) string {
 	// TODO: handle no names, one name, and several names.
-	return ""
+	if len(names) == 0 {
+		return greeting + "!"
+	} else if len(names) == 1 {
+		return greeting + ", " + names[0] + "!"
+	} else {
+		return greeting + ", " + Join(", ", names[:len(names)-1]...) + " and " + names[len(names)-1] + "!"
+	}
 }
