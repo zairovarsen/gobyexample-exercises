@@ -14,7 +14,16 @@ package recursion
 // base case.
 func Factorial(n int) int {
 	// TODO: base case, then n times the factorial of n-1.
-	return 0
+	if n < 0 {
+		return 0
+	}
+
+	if n == 0 || n == 1 {
+		return 1
+	}
+
+
+	return n * Factorial(n-1)
 }
 
 // SumDigits returns the sum of the decimal digits of the non-negative number
@@ -22,8 +31,15 @@ func Factorial(n int) int {
 //
 // Hint: n%10 is the last digit and n/10 is the number without it.
 func SumDigits(n int) int {
-	// TODO: last digit plus the digit sum of the rest.
-	return 0
+
+	if n == 0 {
+		return n
+	}
+
+	last := n % 10
+	rest := n / 10
+	
+	return last + SumDigits(rest)
 }
 
 // GCD returns the greatest common divisor of two non-negative numbers, i.e.

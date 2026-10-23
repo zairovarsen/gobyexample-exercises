@@ -7,13 +7,18 @@
 //	go test ./16-range-over-built-in-types/
 package rangeoverbuiltintypes
 
+import "slices"
+
 // Sum adds up the numbers in nums.
 //
 // range over a slice gives the index and the value of each element. The
 // index is of no use here: ignore it with the blank identifier _.
 func Sum(nums []int) int {
-	// TODO: for _, num := range nums ...
-	return 0
+	sum := 0
+	for _, val := range nums {
+		sum += val
+	}
+	return sum
 }
 
 // IndexOf returns the index of the first element of words that equals
@@ -21,8 +26,14 @@ func Sum(nums []int) int {
 //
 // This time you need the index that range provides.
 func IndexOf(words []string, target string) int {
-	// TODO: range with index and value, return at the first match.
-	return 0
+
+	for i, word := range words {
+		if word == target {
+			return i
+		}
+	}
+	
+	return -1
 }
 
 // Keys returns the keys of m in ascending order: Keys(map[b:2 a:1 c:3])
@@ -33,8 +44,14 @@ func IndexOf(words []string, target string) int {
 //
 // Hint: slices.Sort from the "slices" package sorts a slice in place.
 func Keys(m map[string]int) []string {
-	// TODO: collect the keys with range, then sort them.
-	return nil
+	keys := make([]string, 0, len(m))
+
+	for k := range m {
+		keys = append(keys, k)	
+	}
+
+	slices.Sort(keys)
+	return keys
 }
 
 // Invert returns a new map with keys and values swapped:
@@ -43,8 +60,13 @@ func Keys(m map[string]int) []string {
 //
 // range over a map with two variables gives every key and its value.
 func Invert(m map[string]string) map[string]string {
+	mi := make(map[string]string)
+
+	for k, v := range m {
+		mi[v] = k
+	}
 	// TODO: for k, v := range m ...
-	return nil
+	return mi
 }
 
 // ByteOffsets returns, for every character (rune) of s, the index of the
@@ -55,8 +77,13 @@ func Invert(m map[string]string) map[string]string {
 // That is exactly the first value that range produces when it iterates over
 // a string: range walks through a string rune by rune, not byte by byte.
 func ByteOffsets(s string) []int {
-	// TODO: range over the string and collect the index of every rune.
-	return nil
+	runes := make([]int, 0)
+
+	for v := range s {
+		runes = append(runes, v)
+	}
+	
+	return runes
 }
 
 // GroupByLength sorts words into groups of equal length: the result maps a
@@ -68,6 +95,16 @@ func ByteOffsets(s string) []int {
 //
 // Hint: append works on a slice that is the zero value of a missing map key.
 func GroupByLength(words []string) map[int][]string {
-	// TODO: range over words and append every word to its group.
-	return nil
+	m := make(map[int][]string)
+
+	for _, word := range words {
+		l := len(word)
+		if m[l] == nil {
+			m[l] = make([]string, 0)
+		}
+
+		m[l] = append(m[l], word)
+	}
+
+	return m
 }

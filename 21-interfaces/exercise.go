@@ -7,6 +7,8 @@
 //	go test ./21-interfaces/
 package interfaces
 
+import "math"
+
 // Shape is the interface for geometric shapes. An interface is a named
 // collection of method signatures.
 //
@@ -14,6 +16,8 @@ package interfaces
 // Perimeter, both without parameters and both returning a float64.
 type Shape interface {
 	// TODO: list the two method signatures.
+	Area() float64
+	Perimeter() float64
 }
 
 // Rect is a rectangle. It implements Shape simply by having the methods the
@@ -25,13 +29,13 @@ type Rect struct {
 // Area returns width times height.
 func (r Rect) Area() float64 {
 	// TODO: compute the area.
-	return 0
+	return r.Height * r.Width
 }
 
 // Perimeter returns twice the width plus twice the height.
 func (r Rect) Perimeter() float64 {
 	// TODO: compute the perimeter.
-	return 0
+	return 2 * r.Height + 2 * r.Width
 }
 
 // Circle is a circle with the given radius.
@@ -42,13 +46,13 @@ type Circle struct {
 // Area returns pi times the radius squared. Use math.Pi.
 func (c Circle) Area() float64 {
 	// TODO: compute the area.
-	return 0
+	return math.Pi * c.Radius * c.Radius
 }
 
 // Perimeter returns the circumference: two times pi times the radius.
 func (c Circle) Perimeter() float64 {
 	// TODO: compute the circumference.
-	return 0
+	return 2 * math.Pi * c.Radius
 }
 
 // Square is a square with the given side length.
@@ -60,14 +64,26 @@ type Square struct {
 }
 
 // TODO: declare the methods Area and Perimeter of Square here.
+func (s Square) Area() float64 {
+	return s.Side * s.Side
+}
+
+func (s Square) Perimeter() float64 {
+	return 4 * s.Side
+}
 
 // TotalArea returns the sum of the areas of all the given shapes.
 //
 // The function knows nothing about rectangles or circles: it works with
 // every type that implements Shape, including types written long after it.
 func TotalArea(shapes []Shape) float64 {
+	sum := 0.0
+
+	for _, shape := range shapes {
+		sum += shape.Area()
+	}
 	// TODO: call Area on every shape and add up the results.
-	return 0
+	return sum
 }
 
 // Radius returns the radius of s and true when the Shape holds a Circle. For
@@ -77,7 +93,10 @@ func TotalArea(shapes []Shape) float64 {
 // gets it back: c, ok := s.(Circle) sets ok to true when s holds a Circle,
 // and then c is that Circle with all its fields.
 func Radius(s Shape) (float64, bool) {
-	// TODO: use a type assertion with the two-value form.
+
+	if c, ok := s.(Circle); ok {
+		return c.Radius, true
+	}
 	return 0, false
 }
 
@@ -85,6 +104,17 @@ func Radius(s Shape) (float64, bool) {
 // the biggest area it returns the first of them, and for an empty slice it
 // returns nil (the zero value of an interface type).
 func Largest(shapes []Shape) Shape {
+	if len(shapes) == 0 {
+		return nil
+	}
+
+	largest := shapes[0]
+
+	for i := 1; i < len(shapes); i++ {
+		if shapes[i].Area() > largest.Area() {
+			largest = shapes[i]
+		}
+	}
 	// TODO: compare the areas and remember the best shape so far.
-	return nil
+	return largest
 }

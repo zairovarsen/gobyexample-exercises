@@ -16,7 +16,7 @@ package pointers
 //
 // *p "dereferences" the pointer: it stands for the variable p points to.
 func ZeroPtr(p *int) {
-	// TODO: assign through the pointer.
+	*p = 0
 }
 
 // Swap exchanges the values of the two variables that a and b point to:
@@ -24,6 +24,9 @@ func ZeroPtr(p *int) {
 //	x, y := 1, 2
 //	Swap(&x, &y) // x is now 2, y is now 1
 func Swap(a, b *int) {
+	temp := *b
+	*b = *a
+	*a = temp
 	// TODO: exchange *a and *b.
 }
 
@@ -33,8 +36,7 @@ func Swap(a, b *int) {
 // The & operator gives the address of a variable - and in Go it is fine to
 // return the address of a local variable.
 func NewInt(v int) *int {
-	// TODO: return the address of a variable holding v.
-	return nil
+	return new(v)
 }
 
 // ValueOr returns the int that p points to. A pointer can also point to
@@ -42,7 +44,10 @@ func NewInt(v int) *int {
 // crashes the program. For a nil pointer ValueOr returns fallback instead.
 func ValueOr(p *int, fallback int) int {
 	// TODO: check for nil before dereferencing.
-	return 0
+	if p == nil {
+		return fallback
+	}
+	return *p
 }
 
 // FillArray sets all three elements of the array that a points to to v.
@@ -53,6 +58,9 @@ func ValueOr(p *int, fallback int) int {
 // automatically.)
 func FillArray(a *[3]int, v int) {
 	// TODO: set every element through the pointer.
+	for i := range a {
+		a[i] = v
+	}
 }
 
 // Largest returns a pointer to the largest element of nums - to the element
@@ -69,5 +77,16 @@ func FillArray(a *[3]int, v int) {
 // its address is useless here. &nums[i] is the address of the element.
 func Largest(nums []int) *int {
 	// TODO: find the index of the largest element and return its address.
-	return nil
+	if len(nums) == 0 {
+		return nil
+	}
+
+	largest := &nums[0]
+
+	for i := 0; i < len(nums); i++ {
+		if nums[i] > *largest {
+			largest = &nums[i]
+		}
+	}
+	return largest
 }

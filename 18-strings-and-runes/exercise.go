@@ -7,6 +7,11 @@
 //	go test ./18-strings-and-runes/
 package stringsandrunes
 
+import (
+	"fmt"
+	"unicode/utf8"
+)
+
 // Lengths returns the two lengths of s: first the number of bytes, then the
 // number of runes (characters). For "hello" both are 5, for "héllo" they are
 // 6 and 5, and the Thai word "สวัสดี" has 18 bytes but 6 runes.
@@ -15,7 +20,7 @@ package stringsandrunes
 // package counts runes.
 func Lengths(s string) (int, int) {
 	// TODO: return the byte count and the rune count.
-	return 0, 0
+	return len(s), utf8.RuneCountInString(s)
 }
 
 // HexBytes shows the raw bytes that make up s: every byte as two lower-case
@@ -30,7 +35,15 @@ func Lengths(s string) (int, int) {
 // returns the string instead of printing it.
 func HexBytes(s string) string {
 	// TODO: loop over the byte indexes 0 .. len(s)-1 and format every byte.
-	return ""
+	str := ""
+
+	for i := range len(s) {
+		if i != 0 {
+			str += " "
+		}
+		str += fmt.Sprintf("%02x", s[i])
+	}
+	return str
 }
 
 // CountRune returns how often the rune target occurs in s:
@@ -40,7 +53,13 @@ func HexBytes(s string) string {
 // runes that can be compared with it using ==.
 func CountRune(s string, target rune) int {
 	// TODO: range over s and compare every rune with target.
-	return 0
+	count := 0
+	for _, runeValue := range s {
+		if runeValue == target {
+			count += 1
+		}	
+    }
+	return count
 }
 
 // FirstRune returns the first rune of s and its width, that is the number of
@@ -51,7 +70,7 @@ func CountRune(s string, target rune) int {
 // returns utf8.RuneError and 0, and so should FirstRune.)
 func FirstRune(s string) (rune, int) {
 	// TODO: decode the first rune.
-	return 0, 0
+	return utf8.DecodeRuneInString(s[0:])
 }
 
 // Reverse returns s with its characters in opposite order:
@@ -61,7 +80,11 @@ func FirstRune(s string) (rune, int) {
 // Hint: string(r) turns a rune into a string that can be concatenated.
 func Reverse(s string) string {
 	// TODO: range over the runes and build the result back to front.
-	return ""
+	str := ""
+	for _, v := range s {
+		str = string(v) + str
+	}
+	return str
 }
 
 // Truncate shortens s to at most n characters (runes, not bytes) and never
@@ -72,6 +95,16 @@ func Reverse(s string) string {
 // Hint: the index that range gives for a rune is the byte position at which
 // it starts - exactly what the slice expression s[:i] needs.
 func Truncate(s string, n int) string {
-	// TODO: find the byte position of rune number n and slice the string.
-	return ""
+	if n <= 0 {
+		return ""
+	}
+	seen := 0
+	for i := range s {
+		// i is the byte offset of rune number `seen`.
+		if seen == n {
+			return s[:i]
+		}
+		seen++
+	}
+	return s
 }

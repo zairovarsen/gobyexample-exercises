@@ -13,6 +13,8 @@ package structs
 // string and Age of type int (spelled like this, with capital letters).
 type Person struct {
 	// TODO: declare the fields Name and Age.
+	Name string
+	Age int
 }
 
 // NewPerson is a constructor: it returns a pointer to a new Person with the
@@ -22,8 +24,9 @@ type Person struct {
 // field, set the age with the dot notation afterwards and return the address
 // of the struct.
 func NewPerson(name string) *Person {
-	// TODO: build the Person and return a pointer to it.
-	return nil
+	person := Person{Name: name}
+	person.Age = 42
+	return &person
 }
 
 // Point is a position on a grid. (This one is declared for you.)
@@ -38,7 +41,7 @@ type Point struct {
 // point does not change, whatever you do with p.
 func Translate(p Point, dx, dy int) Point {
 	// TODO: return the moved point.
-	return Point{}
+	return Point{X: p.X + dx, Y: p.Y + dy}
 }
 
 // MoveTo changes the point that p points to so that it lies at (x, y).
@@ -47,7 +50,8 @@ func Translate(p Point, dx, dy int) Point {
 // struct. The dot works on struct pointers as well - the pointer is
 // dereferenced automatically, so there is no need to write (*p).X.
 func MoveTo(p *Point, x, y int) {
-	// TODO: assign to the fields through the pointer.
+	p.X = x
+	p.Y = y
 }
 
 // RexTheDog returns a value of an anonymous struct type - a struct type that
@@ -62,11 +66,14 @@ func RexTheDog() struct {
 	IsGood bool
 } {
 	// TODO: give the dog its name and make it a good dog.
-	var dog struct {
+	return struct {
 		Name   string
 		IsGood bool
+	}{
+		"Rex",
+		true,
 	}
-	return dog
+	
 }
 
 // Rect is an axis-parallel rectangle, described by two opposite corners: Min
@@ -83,6 +90,28 @@ type Rect struct {
 // Example: BoundingBox([{1 5} {4 2} {3 9}]) returns Rect{Min: Point{1, 2},
 // Max: Point{4, 9}}.
 func BoundingBox(points []Point) Rect {
-	// TODO: start with the first point and widen the box for every other one.
-	return Rect{}
+	if len(points) == 0 {
+		return Rect{}
+	}
+
+	sX, lX := points[0].X, points[0].X 
+	sY, lY := points[0].Y, points[0].Y
+
+	for i := 1; i < len(points); i++ {
+		v := points[i]
+		if v.X < sX {
+			sX = v.X
+		}
+		if v.X > lX {
+			lX = v.X
+		}
+		if v.Y < sY {
+			sY = v.Y
+		}
+		if v.Y > lY {
+			lY = v.Y
+		}
+	}
+
+	return Rect{Min: Point{sX, sY}, Max: Point{lX, lY}}
 }
