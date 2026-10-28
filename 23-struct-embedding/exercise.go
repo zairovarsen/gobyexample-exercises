@@ -7,6 +7,8 @@
 //	go test ./23-struct-embedding/
 package structembedding
 
+import "fmt"
+
 // Base is a plain struct that other structs are going to embed.
 type Base struct {
 	Num int
@@ -14,8 +16,7 @@ type Base struct {
 
 // Describe returns "base with num=<Num>", e.g. "base with num=1".
 func (b Base) Describe() string {
-	// TODO: format the description.
-	return ""
+	return fmt.Sprintf("base with num=%d", b.Num)
 }
 
 // Container embeds a Base and adds a field of its own. Thanks to the
@@ -25,6 +26,7 @@ func (b Base) Describe() string {
 // TODO: embed Base in Container. An embedding looks like a field without a
 // name: just the type.
 type Container struct {
+	Base
 	Str string
 }
 
@@ -35,7 +37,12 @@ type Container struct {
 // with the type name serving as the field name.
 func NewContainer(num int, str string) Container {
 	// TODO: build the Container.
-	return Container{}
+	return Container{
+		Base: Base{
+			Num: num,
+		},
+		Str: str,
+	}
 }
 
 // Describer is implemented by everything that can describe itself.
@@ -50,14 +57,22 @@ type Describer interface {
 // only compiles once Container embeds Base.)
 func AsDescriber(c Container) Describer {
 	// TODO: return c.
-	return nil
+	return c
 }
 
 // DescribeAll returns the description of every item, in order.
 // Called without arguments it returns an empty result.
 func DescribeAll(items ...Describer) []string {
-	// TODO: collect the descriptions.
-	return nil
+	result := []string{}
+
+	if len(items) == 0 {
+		return result
+	}
+
+	for _, item := range items {
+		result = append(result, item.Describe())
+	}
+	return result
 }
 
 // Point is a position on a grid.
@@ -68,13 +83,13 @@ type Point struct {
 // Move shifts the point by dx and dy. It has a pointer receiver because it
 // changes the point.
 func (p *Point) Move(dx, dy int) {
-	// TODO: update X and Y.
+	p.X += dx
+	p.Y += dy
 }
 
 // String formats the point like "(1,2)".
 func (p Point) String() string {
-	// TODO: format the point.
-	return ""
+	return fmt.Sprintf("(%d,%d)", p.X, p.Y)
 }
 
 // Circle is a Point (its centre) plus a radius. Embedding promotes the
@@ -83,13 +98,20 @@ func (p Point) String() string {
 //
 // TODO: embed Point in Circle.
 type Circle struct {
+	Point
 	Radius int
 }
 
 // NewCircle returns a Circle with its centre at (x, y) and the given radius.
 func NewCircle(x, y, radius int) Circle {
 	// TODO: build the Circle.
-	return Circle{}
+	return Circle{
+		Point: Point{
+			X: x,
+			Y: y,
+		},
+		Radius: radius,
+	}
 }
 
 // String formats the circle like "circle at (1,2) r=3".
@@ -101,5 +123,5 @@ func NewCircle(x, y, radius int) Circle {
 // Hint: the hidden method is still reachable as c.Point.String().
 func (c Circle) String() string {
 	// TODO: format the circle, reusing the String method of the embedded Point.
-	return ""
+	return fmt.Sprintf("circle at (%d,%d) r=%d", c.X, c.Y, c.Radius)
 }
