@@ -1,30 +1,23 @@
-//go:build !solution
 
-// Package rangeoveriterators contains exercises for https://gobyexample.com/range-over-iterators
-//
-// Run the tests for this section with:
-//
-//	go test ./25-range-over-iterators/
+//go:build solution
+
 package rangeoveriterators
 
-import "iter"
+import (
+	"iter"
+	"slices"
+)
 
-// Countdown returns an iterator over n, n-1, ..., 1. For n <= 0 it yields
-// nothing.
-//
-// An iter.Seq[int] is a function that takes a callback, by convention called
-// yield. The iterator calls yield once for every value, and it has to stop
-// as soon as yield returns false - that is how a `break` in the caller's
-// range loop reaches the iterator.
-//
-// Example: `for v := range Countdown(3)` sees 3, 2, 1.
 func Countdown(n int) iter.Seq[int] {
-	// TODO: return a func(yield func(int) bool) that yields the numbers.
-	return nil
+	return func(yield func(int) bool) {
+		for i := n; i >= 1; i-- {
+			if !yield(i) {
+				return
+			}
+		}
+	}
 }
 
-// List is the generic linked list from the generics section. The type and
-// its Push method are complete; only All is left to do.
 type List[T any] struct {
 	head, tail *element[T]
 }
@@ -34,7 +27,6 @@ type element[T any] struct {
 	val  T
 }
 
-// Push appends v to the end of the list.
 func (lst *List[T]) Push(v T) {
 	if lst.tail == nil {
 		lst.head = &element[T]{val: v}
@@ -45,54 +37,69 @@ func (lst *List[T]) Push(v T) {
 	}
 }
 
-// All returns an iterator over the elements of the list, in the order they
-// were pushed, so that a list can be used directly in a range loop:
-//
-//	for v := range lst.All() { ... }
-//
-// All is the conventional name for such a method.
 func (lst *List[T]) All() iter.Seq[T] {
-	// TODO: return an iterator that walks the list.
-	return nil
+	return func(yield func(T) bool) {
+		for e := lst.head; e != nil; e = e.next {
+			if !yield(e.val) {
+				return
+			}
+		}
+	}
 }
 
-// Fib returns an iterator over the Fibonacci numbers 1, 1, 2, 3, 5, 8, ...
-//
-// The sequence never ends: the iterator keeps yielding for as long as yield
-// returns true, and it is up to the consumer to break out of the loop.
 func Fib() iter.Seq[int] {
-	// TODO: yield Fibonacci numbers until yield returns false.
-	return nil
+	return func(yield func(int) bool) {
+		a, b := 1, 1
+		for {
+			if !yield(a) {
+				return
+			}
+			a, b = b, a+b
+		}
+	}
 }
 
-// Take returns an iterator over the first n values of seq (or over all of
-// them if seq has fewer). For n <= 0 it yields nothing. It stops right after
-// the n-th value, without pulling a value out of seq that it will not pass on.
-//
-// Iterators compose: Take receives one and returns a new one. It makes an
-// endless sequence finite, e.g. Take(Fib(), 5) yields 1, 1, 2, 3, 5.
 func Take[T any](seq iter.Seq[T], n int) iter.Seq[T] {
-	// TODO: range over seq inside the new iterator and stop after n values.
-	return nil
+	return func(yield func(T) bool) {
+		if n <= 0 {
+			return
+		}
+		taken := 0
+		for v := range seq {
+			if !yield(v) {
+				return
+			}
+			// Stop before asking seq for a value nobody wants.
+			if taken++; taken == n {
+				return
+			}
+		}
+	}
 }
 
-// Enumerate pairs every value of seq with its position, counting from 0.
-//
-// The result is an iter.Seq2, whose yield takes two values, for range loops
-// with two variables:
-//
-//	for i, v := range Enumerate(lst.All()) { ... }
 func Enumerate[T any](seq iter.Seq[T]) iter.Seq2[int, T] {
-	// TODO: yield (0, first value), (1, second value), ...
-	return nil
+	return func(yield func(int, T) bool) {
+		i := 0
+		for v := range seq {
+			if !yield(i, v) {
+				return
+			}
+			i++
+		}
+	}
 }
 
-// EvenFibs returns the first n even Fibonacci numbers as a slice, e.g.
-// EvenFibs(4) returns [2 8 34 144]. For n <= 0 the result is empty.
-//
-// Hint: either range over Fib() and break once you have enough, or build a
-// small pipeline of iterators and turn it into a slice with slices.Collect.
+func filter[T any](seq iter.Seq[T], keep func(T) bool) iter.Seq[T] {
+	return func(yield func(T) bool) {
+		for v := range seq {
+			if keep(v) && !yield(v) {
+				return
+			}
+		}
+	}
+}
+
 func EvenFibs(n int) []int {
-	// TODO: collect even Fibonacci numbers.
-	return nil
+	even := func(v int) bool { return v%2 == 0 }
+	return slices.Collect(Take(filter(Fib(), even), n))
 }
