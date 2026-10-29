@@ -7,7 +7,10 @@
 //	go test ./27-custom-errors/
 package customerrors
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 // ArgError is a custom error type. Unlike a plain message it carries data
 // that the caller can inspect: the argument that caused the problem.
@@ -20,15 +23,18 @@ type ArgError struct {
 // "<Arg> - <Message>", e.g. "42 - can't work with it".
 func (e *ArgError) Error() string {
 	// TODO: format the message.
-	return ""
+	return fmt.Sprintf("%d - %s", e.Arg, e.Message)
 }
 
 // Process returns arg + 3 and a nil error - except for 42, which it refuses
 // to work with: then it returns -1 and an *ArgError with Arg 42 and the
 // message "can't work with it".
 func Process(arg int) (int, error) {
+	if arg == 42 {
+		return -1, &ArgError{Arg: 42, Message: "can't work with it"}
+	}
 	// TODO: return a pointer to an ArgError for 42.
-	return 0, nil
+	return arg + 3, nil
 }
 
 // ArgOf looks for an *ArgError in err or in any error that err wraps. If
@@ -40,6 +46,9 @@ func Process(arg int) (int, error) {
 // (errors.AsType does the same with a type parameter.)
 func ArgOf(err error) (int, bool) {
 	// TODO: extract the *ArgError.
+	if ae, ok := errors.AsType[*ArgError](err); ok {
+		return ae.Arg, true
+	}
 	return 0, false
 }
 
@@ -59,7 +68,7 @@ type ValidationError struct {
 // Error returns "<Field>: <message of Err>", e.g. "age: must not be negative".
 func (e *ValidationError) Error() string {
 	// TODO: format the message.
-	return ""
+	return fmt.Sprintf("%s: %s", e.Field, e.Err)
 }
 
 // Unwrap returns the underlying error. This method is what lets errors.Is
@@ -67,7 +76,7 @@ func (e *ValidationError) Error() string {
 // through an error made with fmt.Errorf and %w.
 func (e *ValidationError) Unwrap() error {
 	// TODO: return the wrapped error.
-	return nil
+	return e.Err
 }
 
 // Validate checks the data of a person, the name first:
@@ -80,5 +89,10 @@ func (e *ValidationError) Unwrap() error {
 // stored in the error result would not compare equal to nil.
 func Validate(name string, age int) error {
 	// TODO: return the first problem found, or nil.
+	if name == "" {
+		return &ValidationError{Field: "name", Err: ErrEmpty}
+	} else if age < 0 {
+		return &ValidationError{Field: "age", Err: ErrNegative}
+	}
 	return nil
 }
