@@ -7,6 +7,11 @@
 //	go test ./26-errors/
 package errorsx
 
+import (
+	"errors"
+	"fmt"
+)
+
 // Divide returns a / b (integer division).
 //
 // Dividing by zero is not possible: in that case Divide returns 0 and an
@@ -15,8 +20,10 @@ package errorsx
 //
 // Hint: errors.New builds an error from a message.
 func Divide(a, b int) (int, error) {
-	// TODO: return an error when b is 0, the quotient and nil otherwise.
-	return 0, nil
+	if b == 0 {
+		return 0, errors.New("division by zero")
+	}
+	return a / b, nil
 }
 
 // Sentinel errors: predeclared error values that stand for one specific
@@ -27,8 +34,8 @@ func Divide(a, b int) (int, error) {
 //	ErrOutOfTea: "no more tea available"
 //	ErrPower:    "can't boil water"
 var (
-	ErrOutOfTea error
-	ErrPower    error
+	ErrOutOfTea error = errors.New("no more tea available")
+	ErrPower    error = errors.New("can't boil water")
 )
 
 // MakeTea tries to make cup number arg:
@@ -42,6 +49,11 @@ var (
 // reachable for errors.Is, which a plain %v would not allow.
 func MakeTea(arg int) error {
 	// TODO: return the right error, or nil.
+	if arg == 2 {
+		return ErrOutOfTea
+	} else if arg == 4 {
+		return fmt.Errorf("making tea: %w", ErrPower)
+	}
 	return nil
 }
 
@@ -55,8 +67,18 @@ func MakeTea(arg int) error {
 // Compare with errors.Is rather than ==, so that wrapped errors are
 // recognised too.
 func Describe(err error) string {
-	// TODO: classify err.
-	return ""
+
+	if errors.Is(err, nil) {
+		return "ok"
+	}
+
+	if errors.Is(err, ErrOutOfTea) {
+		return "out of tea"
+	} else if errors.Is(err, ErrPower) {
+		return "no power"
+	} else {
+		return fmt.Sprintf("unknown error: %s", err)
+	}
 }
 
 // BrewAll calls MakeTea for every arg, in order, and stops at the first
@@ -68,6 +90,14 @@ func Describe(err error) string {
 // "cup 2: making tea: can't boil water" for which errors.Is(err, ErrPower)
 // still holds - errors can be wrapped any number of times.
 func BrewAll(args []int) (int, error) {
-	// TODO: loop over args, wrapping the first error with %w.
-	return 0, nil
+	made := 0
+
+	for i, arg := range args {
+		if err := MakeTea(arg); err != nil {
+			return made, fmt.Errorf("cup %d: %w", i, err)
+		}
+		made++
+	}
+
+	return made, nil
 }
