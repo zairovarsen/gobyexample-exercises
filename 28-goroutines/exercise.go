@@ -13,6 +13,7 @@ import "time"
 // waiting for f to finish (or even to start).
 func RunAsync(f func()) {
 	// TODO: use the go keyword.
+	go f()
 }
 
 // StartEach calls f once for every name, each call in a goroutine of its
@@ -23,6 +24,11 @@ func RunAsync(f func()) {
 // the name as its argument: go func(name string) { ... }(name)
 func StartEach(names []string, f func(name string)) {
 	// TODO: start one goroutine per name.
+	for _, name := range names {
+		go func(name string) {
+			f(name)
+		}(name)
+	}
 }
 
 // RunAndWait starts every function of fs in a goroutine of its own and then
@@ -34,6 +40,10 @@ func StartEach(names []string, f func(name string)) {
 // in the next sections, do this properly.
 func RunAndWait(wait time.Duration, fs ...func()) {
 	// TODO: start the goroutines, then time.Sleep.
+	for _, f := range fs {
+		go f()
+	}
+	time.Sleep(wait)
 }
 
 // Tree starts a tree of goroutines and returns right away.
@@ -46,5 +56,13 @@ func RunAndWait(wait time.Duration, fs ...func()) {
 // The visit function is called from many goroutines at once; it is the
 // caller's job to make that safe.
 func Tree(depth int, visit func(level int)) {
+
 	// TODO: a goroutine that visits and then recurses.
+	if depth <= 0 {
+		return
+	}
+
+	go visit(depth)
+	go Tree(depth-1, visit)
+	go Tree(depth-1, visit)
 }
