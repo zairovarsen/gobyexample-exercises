@@ -10,8 +10,8 @@ package channelbuffering
 // NewMailbox returns a channel of strings that buffers up to size values:
 // that many sends succeed even when nobody is receiving yet.
 func NewMailbox(size int) chan string {
-	// TODO: make takes the buffer size as its second argument.
-	return nil
+	box := make(chan string, size)
+	return box
 }
 
 // Preload returns a buffered channel that already holds all the msgs, in
@@ -21,7 +21,11 @@ func NewMailbox(size int) chan string {
 // complete without a concurrent receive.
 func Preload(msgs ...string) chan string {
 	// TODO: make a channel that is just big enough and send every message.
-	return nil
+	ch := make(chan string, len(msgs))
+	for _, msg := range msgs {
+		ch <- msg
+	}
+	return ch
 }
 
 // FillUp sends the value v on ch again and again until the buffer of ch is
@@ -33,8 +37,12 @@ func Preload(msgs ...string) chan string {
 // Hint: len(ch) is the number of values waiting in the buffer and cap(ch)
 // is the size of the buffer.
 func FillUp(ch chan int, v int) int {
-	// TODO: send while there is room.
-	return 0
+	sent := 0
+	for len(ch) < cap(ch) {
+		ch <- v
+		sent++
+	}
+	return sent
 }
 
 // KeepLatest sends v on the buffered channel ch without ever blocking: when
@@ -48,4 +56,10 @@ func FillUp(ch chan int, v int) int {
 // Assume that no other goroutine uses ch at the same time.
 func KeepLatest(ch chan int, v int) {
 	// TODO: drop the oldest value if necessary, then send.
+	if len(ch)+1 > cap(ch) {
+		for len(ch)+1 > cap(ch) {
+			<-ch
+		}
+	}
+	ch <- v
 }
