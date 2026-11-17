@@ -7,6 +7,8 @@
 //	go test ./35-non-blocking-channel-operations/
 package nonblockingchanneloperations
 
+import "fmt"
+
 // TryReceive receives from messages only if a value is available right now.
 // It returns the value and true, or "" and false when it would have to wait.
 // It never blocks.
@@ -14,8 +16,12 @@ package nonblockingchanneloperations
 // Use a select with a default case: default is chosen when no other case is
 // ready.
 func TryReceive(messages <-chan string) (string, bool) {
-	// TODO: select with a receive case and a default case.
-	return "", false
+	select {
+	case msg := <-messages:
+		return msg, true
+	default:
+		return "", false
+	}
 }
 
 // TrySend sends msg on messages only if that is possible right now - a
@@ -23,7 +29,12 @@ func TryReceive(messages <-chan string) (string, bool) {
 // message was sent. It never blocks.
 func TrySend(messages chan<- string, msg string) bool {
 	// TODO: select with a send case and a default case.
-	return false
+	select {
+	case messages <- msg:
+		return true
+	default:
+		return false
+	}
 }
 
 // Poll looks at two channels at once without blocking and reports what it
@@ -38,7 +49,14 @@ func TrySend(messages chan<- string, msg string) bool {
 // Use a multi-way select: several cases plus a default.
 func Poll(messages <-chan string, signals <-chan bool) string {
 	// TODO: select with two receive cases and a default case.
-	return ""
+	select {
+	case msg := <-messages:
+		return fmt.Sprintf("received message %s", msg)
+	case signal := <-signals:
+		return fmt.Sprintf("received signal %t", signal)
+	default:
+		return "no activity"
+	}
 }
 
 // DrainAvailable receives from ch for as long as values are available
@@ -46,7 +64,17 @@ func Poll(messages <-chan string, signals <-chan bool) string {
 // stops; it never blocks. Without any available value the result is empty.
 func DrainAvailable(ch <-chan int) []int {
 	// TODO: a loop around a non-blocking receive.
-	return nil
+	res := make([]int, 0)
+
+	for {
+		select {
+		case num := <-ch:
+			res = append(res, num)
+		default:
+			return res
+		}
+	}
+
 }
 
 // Broadcast offers msg to every subscriber with a non-blocking send, so
