@@ -21,15 +21,24 @@ var ErrTimeout = errors.New("timeout")
 // Use a select with a second case that receives from time.After(d): that is
 // a channel on which a value arrives once the duration d has passed.
 func RecvTimeout(ch <-chan string, d time.Duration) (string, bool) {
-	// TODO: select over ch and time.After(d).
-	return "", false
+	select {
+	case msg := <-ch:
+		return msg, true
+	case <-time.After(d):
+		return "", false
+	}
 }
 
 // SendTimeout tries to send msg on ch, but gives up after d. It reports
 // whether the message was sent.
 func SendTimeout(ch chan<- string, msg string, d time.Duration) bool {
 	// TODO: select over the send and time.After(d).
-	return false
+	select {
+	case ch <- msg:
+		return true
+	case <-time.After(d):
+		return false
+	}
 }
 
 // WithTimeout runs f in a new goroutine and waits for its result, but no
@@ -45,7 +54,18 @@ func SendTimeout(ch chan<- string, msg string, d time.Duration) bool {
 // (a goroutine leak).
 func WithTimeout(f func() string, d time.Duration) (string, error) {
 	// TODO: goroutine + buffered channel + select with a timeout.
-	return "", nil
+	ch := make(chan string, 1)
+
+	go func() {
+		ch <- f()
+	}()
+
+	select {
+	case msg := <-ch:
+		return msg, nil
+	case <-time.After(d):
+		return "", ErrTimeout
+	}
 }
 
 // CollectFor gathers the numbers arriving on ch for the duration d and then
@@ -58,5 +78,16 @@ func WithTimeout(f func() string, d time.Duration) (string, error) {
 // forever.
 func CollectFor(ch <-chan int, d time.Duration) []int {
 	// TODO: loop around a select until the deadline fires.
-	return nil
+	numbers := make([]int, 0)
+
+	deadline := time.After(d)
+
+	for {
+		select {
+		case num := <-ch:
+			numbers = append(numbers, num)
+		case <-deadline:
+			return numbers
+		}
+	}
 }
