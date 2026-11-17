@@ -13,6 +13,7 @@ package channeldirections
 // trying to receive from pings is a compile-time error. (Try it!)
 func Ping(pings chan<- string, msg string) {
 	// TODO: send the message.
+	pings <- msg
 }
 
 // Pong receives one message from pings and sends it on to pongs.
@@ -21,6 +22,8 @@ func Ping(pings chan<- string, msg string) {
 // signature alone tells which way the data flows.
 func Pong(pings <-chan string, pongs chan<- string) {
 	// TODO: receive, then send.
+	msg := <-pings
+	pongs <- msg
 }
 
 // Generate starts a goroutine that sends nums, in order, on a new channel,
@@ -32,13 +35,23 @@ func Pong(pings <-chan string, pongs chan<- string) {
 // simply return the channel it made.
 func Generate(nums ...int) <-chan int {
 	// TODO: make a channel, send on it from a goroutine, return it.
-	return nil
+	done := make(chan int, 1)
+	go func() {
+		for _, num := range nums {
+			done <- num
+		}
+	}()
+	return done
 }
 
 // Double receives n numbers from in and sends twice each number on out, in
 // the same order. It returns after the n-th number is sent.
 func Double(in <-chan int, out chan<- int, n int) {
 	// TODO: loop n times: receive, double, send.
+	for range n {
+		num := <-in
+		out <- num * 2
+	}
 }
 
 // Pipeline doubles every number of nums by wiring the functions above
@@ -49,5 +62,16 @@ func Double(in <-chan int, out chan<- int, n int) {
 // Example: Pipeline([]int{1, 2, 3}) returns [2 4 6].
 func Pipeline(nums []int) []int {
 	// TODO: connect Generate and Double with channels and collect the output.
-	return nil
+	l := len(nums)
+	out := make(chan int, 1)
+	res := make([]int, l)
+
+	ch := Generate(nums...)
+	go Double(ch, out, l)
+
+	for i := range nums {
+		res[i] = <-out
+	}
+
+	return res
 }
