@@ -13,6 +13,8 @@ package channelsynchronization
 // Worker is meant to be started with `go Worker(work, done)`.
 func Worker(work func(), done chan bool) {
 	// TODO: do the work, then signal.
+	work()
+	done <- true
 }
 
 // Start runs work in a new goroutine and returns immediately. The returned
@@ -20,7 +22,9 @@ func Worker(work func(), done chan bool) {
 // the goroutine with a blocking receive: <-Start(work).
 func Start(work func()) chan bool {
 	// TODO: make a done channel, start the goroutine, return the channel.
-	return nil
+	ch := make(chan bool, 1)
+	go Worker(work, ch)
+	return ch
 }
 
 // WaitAll runs every function of works in a goroutine of its own, all at the
@@ -31,6 +35,13 @@ func Start(work func()) chan bool {
 // goroutines. Called without arguments WaitAll returns immediately.
 func WaitAll(works ...func()) {
 	// TODO: start the goroutines, then receive one signal per goroutine.
+	done := make(chan bool, 1)
+	for _, work := range works {
+		go Worker(work, done)
+	}
+	for range works {
+		<-done
+	}
 }
 
 // RunSequence runs the steps strictly one after the other - step 0 has
@@ -42,5 +53,10 @@ func WaitAll(works ...func()) {
 // previous step signals that it is done, runs its own step, and then signals
 // the next one. Called without arguments RunSequence returns immediately.
 func RunSequence(steps ...func()) {
+	done := make(chan bool, 1)
 	// TODO: build the chain of goroutines and wait for the last one.
+	for _, step := range steps {
+		go Worker(step, done)
+		<-done
+	}
 }
